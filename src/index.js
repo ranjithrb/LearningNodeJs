@@ -1,26 +1,26 @@
 const express = require("express");
 const morgan = require("morgan");
+const connectDB = require("./config/database");
+const userModel = require("./models/user");
 
 const PORT = 8081;
 const app = express();
 
 app.use(morgan("dev"));
 
-app.get(
-  "/dummy",
-  (req, res, next) => {
-    next();
-    console.log("This is just a dummy path 1");
-  },
-  (req, res, next) => {
-    console.log("This is just a dummy path 2");
-    next();
-  }
-);
+app.post("/signup", async (req, res) => {
+  try {
+    const userDoc = new userModel({
+      firstName: "Sachin",
+      lastName: "Tendulkar",
+    });
 
-app.get("/dummy", (req, res, next) => {
-  console.log("This is just another dummy path");
-  res.send("This is just a dummy route");
+    await userDoc.save();
+
+    res.send("User created successfully!");
+  } catch (error) {
+    res.status(500).send("User creation failed!");
+  }
 });
 
 app.use("/", (err, req, res, next) => {
@@ -28,6 +28,12 @@ app.use("/", (err, req, res, next) => {
   else next();
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on - ${PORT}`);
-});
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`DB connected & Server listening on - ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`Database connection error`);
+  });
