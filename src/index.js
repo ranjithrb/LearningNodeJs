@@ -18,7 +18,7 @@ app.post("/signup", async (req, res) => {
 
     res.send("User created successfully!");
   } catch (error) {
-    res.status(500).send("User creation failed!");
+    res.status(500).send("User creation failed!" + error.message);
   }
 });
 
@@ -60,12 +60,14 @@ app.delete("/user", async (req, res) => {
 app.patch("/user", async (req, res) => {
   try {
     const userId = req.body.userId;
-    const user = await userModel.findByIdAndUpdate(userId, req.body);
+    const user = await userModel.findByIdAndUpdate(userId, req.body, {
+      runValidators: true,
+    });
     if (!user) return res.status(404).send("User with the given ID not found!");
     res.send(user);
   } catch (error) {
     console.log("err ", error);
-    res.status(500).send("User cannot be updated now!");
+    res.status(500).send("User cannot be updated now!" + error.message);
   }
 });
 
