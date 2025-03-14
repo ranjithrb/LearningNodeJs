@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const bcrypt = require("bcrypt");
+
 const connectDB = require("./config/database");
 const userModel = require("./models/user");
 
@@ -12,7 +14,19 @@ app.use(morgan("dev"));
 // Create a user
 app.post("/signup", async (req, res) => {
   try {
-    const userDoc = new userModel(req.body);
+    const { firstName, lastName, email, password, age, gender, avatar } =
+      req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const userDoc = new userModel({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+      age,
+      gender,
+      avatar,
+    });
 
     await userDoc.save();
 
@@ -20,6 +34,20 @@ app.post("/signup", async (req, res) => {
   } catch (error) {
     res.status(500).send("User creation failed!" + error.message);
   }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await userModel.findOne({ email });
+
+  if (!user) return res.send("Invalid credentials!");
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) return res.send("Invalid credentials!");
+
+  res.send("Login successful!");
 });
 
 // Get a user
