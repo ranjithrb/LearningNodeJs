@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const genderEnums = ["male", "female", "others"];
 
@@ -22,10 +23,18 @@ const userSchema = new mongoose.Schema(
       unique: [true, "You cannot register with this email ID"],
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value))
+          throw new Error("Please provide a valid email");
+      },
     },
     password: {
       type: String,
       required: [true, "Please provide a strong password"],
+      validate(value) {
+        if (!validator.isStrongPassword(value))
+          throw new Error("Please provide a strong password");
+      },
     },
     age: {
       type: Number,
@@ -39,6 +48,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://cdn.iconscout.com/icon/free/png-512/free-user-icon-download-in-svg-png-gif-file-formats--avatar-profile-account-people-interface-pack-icons-2764602.png?f=webp&w=512",
+      validate(value) {
+        if (!validator.isURL(value))
+          throw new Error("Photo URL must be a valid URL");
+      },
     },
     conditionalValue: {
       type: String,
