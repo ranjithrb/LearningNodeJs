@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const { jwtConfigs } = require("../utils/constants");
 
 const genderEnums = ["male", "female", "others"];
 
@@ -62,6 +66,15 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.methods.getJWTToken = function () {
+  const user = this;
+  return jwt.sign({ userId: user._id }, jwtConfigs.jwtSecret);
+};
+
+userSchema.methods.checkPassword = async function (passwordInputByUser) {
+  return await bcrypt.compare(passwordInputByUser, this.password);
+};
 
 const userModel = mongoose.model("User", userSchema);
 module.exports = userModel;
