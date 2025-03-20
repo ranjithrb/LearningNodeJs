@@ -11,7 +11,7 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
 
     res.send(user);
   } catch (error) {
-    res.status(500).send("User cannot be fetched now! " + error.message);
+    res.status(400).send("User cannot be fetched now! " + error.message);
   }
 });
 

@@ -26,7 +26,7 @@ authRouter.post("/signup", async (req, res) => {
 
     res.send("User created successfully!");
   } catch (error) {
-    res.status(500).send("User creation failed!" + error.message);
+    res.status(400).send("User creation failed!" + error.message);
   }
 });
 
@@ -48,7 +48,19 @@ authRouter.post("/login", async (req, res) => {
 
     res.send("Login successful!");
   } catch (error) {
-    res.status(500).send("User cannot login now! " + error.message);
+    res.status(400).send("User cannot login now! " + error.message);
+  }
+});
+
+authRouter.post("/logout", async (req, res) => {
+  try {
+    res
+      .cookie("token", null, {
+        expires: new Date(Date.now()),
+      })
+      .send("Logout successful!");
+  } catch (error) {
+    res.status(400).send("Logout error: " + error.message);
   }
 });
 

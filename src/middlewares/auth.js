@@ -18,7 +18,7 @@ async function userAuth(req, res, next) {
     req.user = user;
     next();
   } catch (error) {
-    res.status(500).send("Error: " + error.message);
+    res.status(400).send("Error: " + error.message);
   }
 }
 
