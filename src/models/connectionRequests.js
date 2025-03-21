@@ -26,6 +26,13 @@ const connectionRequestSchema = mongoose.Schema(
   }
 );
 
+connectionRequestSchema.pre("save", function (next) {
+  if (this.toUserId.equals(this.fromUserId)) {
+    throw new Error("Receiver & the sender cannot be the same!");
+  }
+  next();
+});
+
 const connectionRequestModel = mongoose.model(
   "ConnectionRequest",
   connectionRequestSchema

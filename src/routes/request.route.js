@@ -77,7 +77,9 @@ requestRouter.post(
       });
     } catch (error) {
       console.log(error);
-      res.status(400).send("Failed to sent connection request");
+      res
+        .status(400)
+        .send("Failed to sent connection request " + error.message);
     }
   }
 );

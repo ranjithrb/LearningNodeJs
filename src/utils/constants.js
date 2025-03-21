@@ -10,7 +10,7 @@ const connectionStatus = {
   rejected: "rejected",
 };
 
-const connectionStatusValues = Object.keys(connectionStatus);
+const connectionStatusValues = Object.values(connectionStatus);
 
 module.exports = {
   jwtConfigs,
