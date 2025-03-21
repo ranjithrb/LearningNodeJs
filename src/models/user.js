@@ -11,13 +11,13 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      minLength: 1,
+      minLength: [1, "Provide your first name"],
       maxLength: [30, "Your first name is too long!. Shorten it please"],
       trim: true,
     },
     lastName: {
       type: String,
-      minLength: 1,
+      minLength: [1, "Provide your last name"],
       maxLength: [30, "Your last name is too long!. Shorten it please"],
       trim: true,
     },
@@ -46,7 +46,10 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: genderEnums,
+      enum: {
+        values: genderEnums,
+        message: "gender : {VALUE} is not supported",
+      },
     },
     avatar: {
       type: String,
@@ -57,9 +60,16 @@ const userSchema = new mongoose.Schema(
           throw new Error("Photo URL must be a valid URL");
       },
     },
-    conditionalValue: {
+    aboutMe: {
       type: String,
-      maxLength: [10, "You have exceeded the maximum length"],
+      maxLength: [1000, "You have exceeded the maximum length"],
+    },
+    skills: {
+      type: [String],
+      validate(items) {
+        if (items.length > 100)
+          throw new Error(" Maximum skills limit reached!");
+      },
     },
   },
   {

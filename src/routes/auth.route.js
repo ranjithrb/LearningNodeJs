@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const userModel = require("./../models/user");
+const { jwtConfigs } = require("../utils/constants");
 
 const authRouter = express.Router();
 
@@ -11,7 +12,7 @@ authRouter.post("/signup", async (req, res) => {
     const { firstName, lastName, email, password, age, gender, avatar } =
       req.body;
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, jwtConfigs.saltRounds);
     const userDoc = new userModel({
       firstName,
       lastName,
