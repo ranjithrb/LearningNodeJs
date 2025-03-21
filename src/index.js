@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const authRouter = require("./routes/auth.route");
 const profileRouter = require("./routes/profile.route");
+const requestRouter = require("./routes/request.route");
 
 const PORT = 8081;
 const app = express();
@@ -15,6 +16,7 @@ app.use(morgan("dev"));
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 app.use("/", (err, req, res, next) => {
   if (err) res.status(500).send(err.message);

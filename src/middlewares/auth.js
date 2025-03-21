@@ -13,6 +13,7 @@ async function userAuth(req, res, next) {
 
     const user = await userModel.findById(obj.userId);
 
+    // Discuss: don't we need to remove the cookie if user is not found?
     if (!user) return res.status(404).send("No records found!");
 
     req.user = user;
