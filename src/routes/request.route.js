@@ -17,8 +17,6 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.connectionStatus;
 
-      console.log("toUserId -- ", toUserId);
-
       const validStatusValues = [
         connectionStatus.ignored,
         connectionStatus.interested,
@@ -80,6 +78,61 @@ requestRouter.post(
       res
         .status(400)
         .send("Failed to sent connection request " + error.message);
+    }
+  }
+);
+
+requestRouter.post(
+  "/request/review/:connectionStatus/:connectionId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const status = req.params.connectionStatus;
+      const connectionId = req.params.connectionId;
+
+      const validStatusValues = [
+        connectionStatus.accepted,
+        connectionStatus.rejected,
+      ];
+
+      const isMongoId = validator.isMongoId(connectionId);
+
+      if (!isMongoId)
+        return res.status(400).json({ message: "Invalid connection request" });
+
+      if (!validStatusValues.includes(status))
+        return res.status(400).json({
+          message: "The status value '" + status + "', is invalid!",
+        });
+
+      const existsConnectionRequest = await connectionRequestModel.findOne({
+        status: connectionStatus.interested,
+        _id: connectionId,
+        toUserId: loggedInUser._id,
+      });
+
+      if (!existsConnectionRequest)
+        return res.status(400).json({
+          message: "No connection request exists!",
+        });
+
+      const data = await connectionRequestModel.findByIdAndUpdate(
+        existsConnectionRequest._id,
+        { status }
+      );
+
+      let message = loggedInUser.firstName + " has " + status + " the request";
+
+      res.json({
+        message,
+        data,
+      });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(400)
+        .send("Failed to review connection request " + error.message);
     }
   }
 );
