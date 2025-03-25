@@ -7,7 +7,7 @@ const { connectionStatus } = require("../utils/constants");
 const userRouter = express.Router();
 
 userRouter.get(
-  "/user/connectionRequests/received",
+  "/users/connectionRequests/received",
   userAuth,
   async (req, res) => {
     try {
@@ -23,9 +23,31 @@ userRouter.get(
 
       res.json({ data });
     } catch (error) {
-      res.send("Cannot find user requests " + error.message);
+      res.status(400).json({ message: error.message });
     }
   }
 );
+
+userRouter.get("/users/connections", userAuth, async (req, res) => {
+  try {
+    const connections = await connectionRequestModel
+      .find({
+        status: connectionStatus.accepted,
+        $or: [{ fromUserId: req.user._id }, { toUserId: req.user._id }],
+      })
+      .populate("fromUserId", "firstName lastName");
+
+    // Todo: This is not tested. Need to check/test the edge cases
+
+    const data = connections.map((item) => {
+      if (item.fromUserId._id.toString() === item.fromUserId.toString())
+        return item.toUserId;
+      return item.fromUserId;
+    });
+    res.json({ data });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
 module.exports = userRouter;
